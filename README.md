@@ -1,4 +1,5 @@
 # vrata
+
 [![Build Status](https://travis-ci.org/PoweredLocal/vrata.svg)](https://travis-ci.org/PoweredLocal/vrata)
 [![Latest Stable Version](https://poser.pugx.org/poweredlocal/vrata/v/stable)](https://packagist.org/packages/poweredlocal/vrata)
 [![Code Climate](https://codeclimate.com/github/PoweredLocal/vrata/badges/gpa.svg)](https://codeclimate.com/github/PoweredLocal/vrata)
@@ -22,15 +23,15 @@ Introductory blog post [in English](https://medium.com/@poweredlocal/developing-
 
 ## Requirements and dependencies
 
-- PHP >= 7.0
-- Lumen 5.3
+- PHP >= 7.1.3
+- Lumen 5.6
 - Guzzle 6
 - Laravel Passport (with [Lumen Passport](https://github.com/dusterio/lumen-passport))
 - Memcached (for request throttling)
 
 ## Running as a Docker container
 
-Ideally, you want to run this as a stateless Docker container configured entirely by environment variables. Therefore, you don't even need to deploy 
+Ideally, you want to run this as a stateless Docker container configured entirely by environment variables. Therefore, you don't even need to deploy
 this code anywhere yourself - just use our [public Docker Hub image](https://hub.docker.com/r/pwred/vrata).
 
 Deploying it is as easy as:
@@ -66,7 +67,7 @@ See Laravel/Lumen documentation for the list of supported databases.
 
 #### APP_KEY
 
-Lumen application key 
+Lumen application key
 
 ### Gateway variables
 
@@ -81,6 +82,7 @@ $ openssl genrsa -out private.key 4096
 ```
 
 Replace new line characters with \n:
+
 ```bash
 awk 1 ORS='\\n' private.key
 ```
@@ -90,11 +92,13 @@ awk 1 ORS='\\n' private.key
 Put your public RSA key in this variable
 
 Extract public key using OpenSSL:
+
 ```bash
 $ openssl rsa -in private.key -pubout > public.key
 ```
 
 Replace new line characters with \n:
+
 ```bash
 awk 1 ORS='\\n' public.key
 ```
@@ -113,7 +117,7 @@ JSON object with global settings
 
 ### Logging
 
-Currently only LogEntries is supported out of the box. To send nginx and Lumen logs to LE, simply set two 
+Currently only LogEntries is supported out of the box. To send nginx and Lumen logs to LE, simply set two
 environmetn variables:
 
 #### LOGGING_ID
@@ -128,11 +132,11 @@ Your user key with LogEntries
 
 - Built-in OAuth2 server to handle authentication for all incoming requests
 - Aggregate queries (combine output from 2+ APIs)
-- Output restructuring 
-- Aggregate Swagger documentation (combine Swagger docs from underlying services) *
+- Output restructuring
+- Aggregate Swagger documentation (combine Swagger docs from underlying services) \*
 - Automatic mount of routes based on Swagger JSON
-- Sync and async outgoing requests 
-- DNS service discovery 
+- Sync and async outgoing requests
+- DNS service discovery
 
 ## Installation
 
@@ -198,14 +202,14 @@ $ curl -v http://localhost:8000/api/doc/uploads
 
 This endpoint may be auto-imported to API gateway during container start (or whenever you see it fit).
 
-Assuming this microservice is listed in *GATEWAY_SERVICES*, we can now run auto-import:
+Assuming this microservice is listed in _GATEWAY_SERVICES_, we can now run auto-import:
 
 ```bash
-$ php artisan gateway:parse                                                                                                                                              
-** Parsing service1                                                                                                                                                         
-Processing API action: http://localhost:8000/uploads                                                                                                                
-Dumping route data to JSON file                                                                                                                                          
-Finished!                                                                       
+$ php artisan gateway:parse
+** Parsing service1
+Processing API action: http://localhost:8000/uploads
+Dumping route data to JSON file
+Finished!
 ```
 
 That's it - Vrata will now "proxy" all requests for `/uploads` to this microservice.
@@ -219,25 +223,26 @@ to move OAuth2 server outside and rely on JWT token verification using public ke
 If incoming bearer token is invalid, Vrata will return 401 Non Authorized error. If the token is valid,
 Vrata will add two extra headers when making requests to underlying microservices:
 
-*X-User*
+_X-User_
 
 Numeric subject Id extracted from the JSON Web Token. Your microservices can always assume the authentication
 part is done already and trust this user Id. If you want to implement authorization, you may base it on
 this Id or on token scopes (see below).
 
-*X-Token-Scopes*
+_X-Token-Scopes_
 
-Token scopes extracted from the JSON web token. Comma separated (eg. ```read,write```)
+Token scopes extracted from the JSON web token. Comma separated (eg. `read,write`)
 
-Your microservice may use these for authorization purposes (restrict certain actions, etc). 
+Your microservice may use these for authorization purposes (restrict certain actions, etc).
 
-*X-Client-Ip*
+_X-Client-Ip_
 
 Original user IP address.
 
 ### Basic output mutation
 
-You can do basic JSON output mutation using ```output``` property of an action. Eg.
+You can do basic JSON output mutation using `output` property of an action. Eg.
+
 ```php
 [
     'service' => 'service1',
@@ -248,9 +253,10 @@ You can do basic JSON output mutation using ```output``` property of an action. 
 ];
 ```
 
-Response from *service1* will be included in the final output under *data* key. 
+Response from _service1_ will be included in the final output under _data_ key.
 
-```output_key``` can be an array to allow further mutation:
+`output_key` can be an array to allow further mutation:
+
 ```php
 [
     'service' => 'service1',
@@ -265,8 +271,8 @@ Response from *service1* will be included in the final output under *data* key.
 ];
 ```
 
-This will assign contents of *id* property to *garbage_id*, *title* to *service_title*
-and the rest of the content will be inside of *service_more* property of the output JSON.
+This will assign contents of _id_ property to _garbage_id_, _title_ to _service_title_
+and the rest of the content will be inside of _service_more_ property of the output JSON.
 
 ## Performance
 
@@ -297,7 +303,7 @@ $ time curl http://gateway.local/devices/5/details
 real    0m0.056s
 ```
 
-And it's just 56ms for all 3 requests! Second and third requests were executed in parallel (in async mode). 
+And it's just 56ms for all 3 requests! Second and third requests were executed in parallel (in async mode).
 
 This is pretty decent, we think!
 
@@ -311,37 +317,37 @@ First, we need to let the gateway know about this microservice by adding it to G
 
 ```json
 {
-	"service": []
+  "service": []
 }
 ```
 
-Where *service* is the nickname we chose for our microservice. The array is empty because we will rely on default settings.
-Our service has a valid Swagger documentation endpoint running on ```api/doc``` URL.
+Where _service_ is the nickname we chose for our microservice. The array is empty because we will rely on default settings.
+Our service has a valid Swagger documentation endpoint running on `api/doc` URL.
 
 Next, we provide global settings on GATEWAY_GLOBAL environment variable:
 
 ```json
 {
-	"prefix": "/v1",
-	"timeout": 3.0,
-	"doc_point": "/api/doc",
-	"domain": "supercompany.io"
+  "prefix": "/v1",
+  "timeout": 3.0,
+  "doc_point": "/api/doc",
+  "domain": "supercompany.io"
 }
 ```
 
 This tells the gateway that services that don't have explicit URLs provided, will be communicated at
 {serviceId}.{domain}, therefore our service will be contacted at service.supercompany.io, request timeout will be 3 seconds,
-Swagger documentation will be loaded from ```/api/doc``` and all routes will be prefixed with "v1".
+Swagger documentation will be loaded from `/api/doc` and all routes will be prefixed with "v1".
 
 We could however specify service's hostname explicitly using "hostname" key in the GATEWAY_SERVICES array.
 
-Now we can run ```php artisan gateway:parse``` to force Vrata to parse Swagger documentation
+Now we can run `php artisan gateway:parse` to force Vrata to parse Swagger documentation
 provided by this service. All documented routes will be exposed in this API gateway.
 
 If you use our Docker image, this command will be executed every time you start a container.
 
-Now, if your service had a route ```GET http://service.supercompany.io/users```, it will be available as
-```GET http://api-gateway.supercompany.io/v1/users``` and all requests will be subject to JSON Web Token check and rate limiting.
+Now, if your service had a route `GET http://service.supercompany.io/users`, it will be available as
+`GET http://api-gateway.supercompany.io/v1/users` and all requests will be subject to JSON Web Token check and rate limiting.
 
 Don't forget to set PRIVATE_KEY and PUBLIC_KEY environment variables, they are necessary for authentication to work.
 
@@ -353,8 +359,8 @@ anywhere. Let's first define **GATEWAY_SERVICES** environment variable:
 
 ```json
 {
-	"core": [],
-	"service1": []
+  "core": [],
+  "service1": []
 }
 ```
 
@@ -364,10 +370,10 @@ Let's define **GATEWAY_GLOBAL** variable now - this variable contains global set
 
 ```json
 {
-	"prefix": "/v1",
-	"timeout": 10.0,
-	"doc_point": "/api/doc",
-	"domain": "live.vrata.io"
+  "prefix": "/v1",
+  "timeout": 10.0,
+  "doc_point": "/api/doc",
+  "domain": "live.vrata.io"
 }
 ```
 
@@ -375,7 +381,7 @@ All routes imported from Swagger will be prefixed with "/v1" because of the firs
 we give our API gateway for internal requests to microservices behind it. "doc_point" is the URI of Swagger
 documentation, and "domain" is the DNS domain that will be added to every service name.
 
-Therefore, when Vrata tries to load Swagger documentation for "core" service, it will hit *http://core.live.vrata.io/api/doc* URL.
+Therefore, when Vrata tries to load Swagger documentation for "core" service, it will hit _http://core.live.vrata.io/api/doc_ URL.
 If you have unique Swagger URIs per microservice - you can define "doc_point" for every service individually.
 
 Setting these two variables is enough to start working with Vrata - it will import all routes from "core" and "service1"
@@ -387,61 +393,69 @@ microservices at the same time, we need to define a third environment variable -
 Consider this example:
 
 ```json
-[{
-	"aggregate": true,
-	"method": "GET",
-	"path": "/v1/connections/{id}",
-	"actions": {
-		"venue": {
-			"service": "core",
-			"method": "GET",
-			"path": "venues/{id}",
-			"sequence": 0,
-			"critical": true,
-			"output_key": "venue"
-		},
-		"connections": {
-			"service": "service1",
-			"method": "GET",
-			"path": "connections/{venue%data.id}",
-			"sequence": 1,
-			"critical": false,
-			"output_key": {
-				"data": "venue.clients"
-			}
-		},
-		"access-lists": {
-			"service": "service1",
-			"method": "GET",
-			"path": "/metadata/{venue%data.id}",
-			"sequence": 1,
-			"critical": false,
-			"output_key": {
-				"data": "venue.metadata"
-			}
-		}
-	}
-}, {
-	"method": "GET",
-	"path": "/v1/about",
-	"public": true,
-	"actions": [{
-		"service": "service1",
-		"method": "GET",
-		"path": "static/about",
-		"sequence": 0,
-		"critical": true
-	}]
-}, {
-	"method": "GET",
-	"path": "/v1/history",
-	"raw": true,
-	"actions": [{
-		"method": "GET",
-		"service": "core",
-		"path": "/connections/history"
-	}]
-}]
+[
+  {
+    "aggregate": true,
+    "method": "GET",
+    "path": "/v1/connections/{id}",
+    "actions": {
+      "venue": {
+        "service": "core",
+        "method": "GET",
+        "path": "venues/{id}",
+        "sequence": 0,
+        "critical": true,
+        "output_key": "venue"
+      },
+      "connections": {
+        "service": "service1",
+        "method": "GET",
+        "path": "connections/{venue%data.id}",
+        "sequence": 1,
+        "critical": false,
+        "output_key": {
+          "data": "venue.clients"
+        }
+      },
+      "access-lists": {
+        "service": "service1",
+        "method": "GET",
+        "path": "/metadata/{venue%data.id}",
+        "sequence": 1,
+        "critical": false,
+        "output_key": {
+          "data": "venue.metadata"
+        }
+      }
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/v1/about",
+    "public": true,
+    "actions": [
+      {
+        "service": "service1",
+        "method": "GET",
+        "path": "static/about",
+        "sequence": 0,
+        "critical": true
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "path": "/v1/history",
+    "raw": true,
+    "actions": [
+      {
+        "method": "GET",
+        "service": "core",
+        "path": "/connections/history"
+      }
+    ]
+  }
+]
 ```
 
 The config above defines 3 routes - two regular requests with custom settings and one aggregate request. Let's start
@@ -449,16 +463,18 @@ with simple requests:
 
 ```json
 {
-	"method": "GET",
-	"path": "/v1/about",
-	"public": true,
-	"actions": [{
-		"service": "service1",
-		"method": "GET",
-		"path": "static/about",
-		"sequence": 0,
-		"critical": true
-	}]
+  "method": "GET",
+  "path": "/v1/about",
+  "public": true,
+  "actions": [
+    {
+      "service": "service1",
+      "method": "GET",
+      "path": "static/about",
+      "sequence": 0,
+      "critical": true
+    }
+  ]
 }
 ```
 
@@ -470,59 +486,62 @@ Another simple route:
 
 ```json
 {
-	"method": "GET",
-	"path": "/v1/history",
-	"raw": true,
-	"actions": [{
-		"method": "GET",
-		"service": "core",
-		"path": "/connections/history"
-	}]
+  "method": "GET",
+  "path": "/v1/history",
+  "raw": true,
+  "actions": [
+    {
+      "method": "GET",
+      "service": "core",
+      "path": "/connections/history"
+    }
+  ]
 }
 ```
 
 This will add a "/v1/history" endpoint that will request data from http://core.live.vrata.io/connections/history.
 Notice the "raw" flag - this means Vrata won't do any JSON parsing at all (and therefore you won't be able to mutate
-output as result). This is important for performance - PHP may choke if you json_decode() and then json_encode() a huge string 
+output as result). This is important for performance - PHP may choke if you json_decode() and then json_encode() a huge string
+
 - arrays and objects are very memory expensive in PHP.
 
 And finally our aggregate route:
 
 ```json
 {
-	"aggregate": true,
-	"method": "GET",
-	"path": "/v1/connections/{id}",
-	"actions": {
-		"venue": {
-			"service": "core",
-			"method": "GET",
-			"path": "venues/{id}",
-			"sequence": 0,
-			"critical": true,
-			"output_key": "venue"
-		},
-		"connections": {
-			"service": "service1",
-			"method": "GET",
-			"path": "connections/{venue%data.id}",
-			"sequence": 1,
-			"critical": false,
-			"output_key": {
-				"data": "venue.clients"
-			}
-		},
-		"access-lists": {
-			"service": "service1",
-			"method": "GET",
-			"path": "/metadata/{venue%data.id}",
-			"sequence": 1,
-			"critical": false,
-			"output_key": {
-				"data": "venue.metadata"
-			}
-		}
-	}
+  "aggregate": true,
+  "method": "GET",
+  "path": "/v1/connections/{id}",
+  "actions": {
+    "venue": {
+      "service": "core",
+      "method": "GET",
+      "path": "venues/{id}",
+      "sequence": 0,
+      "critical": true,
+      "output_key": "venue"
+    },
+    "connections": {
+      "service": "service1",
+      "method": "GET",
+      "path": "connections/{venue%data.id}",
+      "sequence": 1,
+      "critical": false,
+      "output_key": {
+        "data": "venue.clients"
+      }
+    },
+    "access-lists": {
+      "service": "service1",
+      "method": "GET",
+      "path": "/metadata/{venue%data.id}",
+      "sequence": 1,
+      "critical": false,
+      "output_key": {
+        "data": "venue.metadata"
+      }
+    }
+  }
 }
 ```
 
@@ -531,13 +550,13 @@ First property marks it as an aggregate route - that's self explanatory. The rou
 to microservices and two of them can be made in parallel - because they have the same sequence number of 1.
 
 Vrata will first make a request to http://core.live.vrata.io/venues/{id} where {id} is the parameter from request.
-This route action is marked as critical - therefore, if it fails the whole request is abandoned. 
+This route action is marked as critical - therefore, if it fails the whole request is abandoned.
 All output from this action will be presented in the final JSON output as "venue" property.
 
 Then, two requests will be launched simultaneously - to http://service1.live.vrata.io/connections/{id}
 and another to http://service1.live.vrata.io/metadata/{id}. This time, {id} is taken from the output of
 the previous action. Vrata will collect all outputs from all requests and make them available to all
-following requests. 
+following requests.
 
 Since these two requests always happen later than the first one (because of the sequence setting),
 they can have access to its output. Notice {venue%data.id} in the paths - this refers to "venue" (name
@@ -547,7 +566,7 @@ Both actions are set to non-critical - if they fail, user will still receive a r
 fields will be empty.
 
 We only take "data" JSON property from both responses and we inject it to the final response as
- "venue.clients" and "venue.metadata".
+"venue.clients" and "venue.metadata".
 
 ## License
 
